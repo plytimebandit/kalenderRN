@@ -7,7 +7,7 @@
 
 \setcounter{errorcontextlines}{100}
 \NeedsTeXFormat{LaTeX2e}[1999/12/01]
-\ProvidesClass{tikz-kalender}[2019/11/22 v0.4f Calendar class (RN)] 
+\ProvidesClass{tikz-kalender}[2019/11/22 v0.4f Calendar class (RN)]
 
 \DeclareOption*{\OptionNotUsed}
 \ProcessOptions\relax
@@ -233,7 +233,13 @@
   \pgfkeys{/RN/period/.cd, #3}%
   \edef\@tempa{%
     \noexpand\ifdate{between=#1 and #2}{%
-      \noexpand\tikzset{every day/.style={fill=\RN@periodColor}}}{}%
+      \noexpand\ifdate{workday}{%
+      \noexpand\tikzset{every day/.style={fill=\RN@periodColor, opacity=0.4, text opacity=1}}}{}%
+      \noexpand\ifdate{Saturday}{%
+      \noexpand\tikzset{every day/.style={fill=\RN@periodColor, opacity=0.75, text opacity=1}}}{}%
+      \noexpand\ifdate{Sunday}{%
+      \noexpand\tikzset{every day/.style={fill=\RN@periodColor, opacity=1, text opacity=1}}}{}%
+    }{}%
   }%
   \expandafter\g@addto@macro\expandafter\RN@periods\expandafter{\@tempa}%
   \ifx\RN@period@name\@empty\else
