@@ -58,6 +58,7 @@
 \newdimen\RN@eventwidthS 
 
 \newif\ifRN@showweeknumbers \RN@showweeknumbersfalse
+\newif\ifRN@onePageOnly \RN@onePageOnlyfalse
 \newif\ifRN@print \RN@printfalse
 \newif\ifRN@XeOrLua \RN@XeOrLuafalse
 \RequirePackage{ifluatex,ifxetex}
@@ -70,6 +71,7 @@
 \pgfkeys{
   /RN/.cd,
   showweeknumbers/.is if = RN@showweeknumbers,
+  onePageOnly/.is if = RN@onePageOnly,
   print/.is if = RN@print,
   events/.store in=\RN@events@files,
   titleFont/.store in=\RN@titleFont,
@@ -155,15 +157,27 @@
   \@tempcnta=\RN@calheight
   \divide\@tempcnta by \@M %
   \RN@yunit=\@tempcnta sp %                 0.05974pt (a4)
-  \RN@daywidth=1515\RN@xunit%                    45mm (a4)
-  \RN@daysep=118\RN@xunit   %                   3.5mm (a4)
-  \RN@dayheight=192\RN@xunit%                   5.7mm (a4)
-  \RN@setFont{RN@dayFont}{134}%                   8pt (a4)     
-  \RN@setFont{RN@dayNbFont}{167}%                10pt (a4)
-  \RN@setFont{RN@eventFont}{134}%                 8pt (a4)
-  \RN@setFont[\normalfont]{RN@normalFont}{167}%  10pt (a4)
-  \RN@setFont{RN@weekNbFont}{134}%                8pt (a4)
-  \RN@setFont[\bfseries]{RN@monthFont}{167}%     10pt (a4)
+  \ifRN@onePageOnly
+    \RN@daywidth=740\RN@xunit%
+    \RN@daysep=80\RN@xunit   %
+    \RN@dayheight=192\RN@xunit%
+    \RN@setFont{RN@dayFont}{100}%
+    \RN@setFont{RN@dayNbFont}{127}%
+    \RN@setFont{RN@eventFont}{100}%
+    \RN@setFont[\normalfont]{RN@normalFont}{127}%
+    \RN@setFont{RN@weekNbFont}{100}%
+    \RN@setFont[\bfseries]{RN@monthFont}{127}%
+  \else
+    \RN@daywidth=1515\RN@xunit%                    45mm (a4)
+    \RN@daysep=118\RN@xunit   %                   3.5mm (a4)
+    \RN@dayheight=192\RN@xunit%                   5.7mm (a4)
+    \RN@setFont{RN@dayFont}{134}%                   8pt (a4)
+    \RN@setFont{RN@dayNbFont}{167}%                10pt (a4)
+    \RN@setFont{RN@eventFont}{134}%                 8pt (a4)
+    \RN@setFont[\normalfont]{RN@normalFont}{167}%  10pt (a4)
+    \RN@setFont{RN@weekNbFont}{134}%                8pt (a4)
+    \RN@setFont[\bfseries]{RN@monthFont}{167}%     10pt (a4)
+  \fi
   \RN@setFont[\bfseries]{RN@titleFont}{666}%     40pt (a4)
   \RN@setFont[\bfseries]{RN@yearFont}{1000}%     60pt (a4)
   \RN@normalFont
@@ -370,18 +384,24 @@
     \def\do##1{\InputIfFileExists{##1.events}{}{}}%
     \expandafter\docsvlist\expandafter{\RN@events@files}%
   \endgroup
-  \sbox{\RN@pageI}{\RN@makeKalender{\RN@year-01-01}{\RN@year-06-30}}%
-  \sbox{\RN@pageII}{\RN@makeKalender{\RN@year-07-01}{\RN@year-12-31}}%
+  \ifRN@onePageOnly
+    \sbox{\RN@pageI}{\RN@makeKalender{\RN@year-01-01}{\RN@year-12-31}}%
+  \else
+    \sbox{\RN@pageI}{\RN@makeKalender{\RN@year-01-01}{\RN@year-06-30}}%
+    \sbox{\RN@pageII}{\RN@makeKalender{\RN@year-07-01}{\RN@year-12-31}}%
+  \fi
   \ifRN@print
     \rotatebox[origin=c]{90}{\usebox\RN@pageI}%
   \else
     \usebox\RN@pageI
   \fi
-  \newpage
-  \ifRN@print
-    \rotatebox[origin=c]{-90}{\usebox\RN@pageII}%
-  \else
-    \usebox\RN@pageII
+  \ifRN@onePageOnly\else
+    \newpage
+    \ifRN@print
+      \rotatebox[origin=c]{-90}{\usebox\RN@pageII}%
+    \else
+      \usebox\RN@pageII
+    \fi
   \fi
 }
 
